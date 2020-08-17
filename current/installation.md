@@ -18,7 +18,7 @@ To install Rejoice and craft your application, you need `composer` installed on 
 Then, create a Rejoice project by running in the console:
 
 ```php
-composer create-project --prefer-dist prinx/rejoice my-ussd-app
+composer create-project --prefer-dist rejoice/rejoice my-ussd-app
 ```
 This will create a project in the `my-ussd-app` directory. 
 

@@ -12,7 +12,7 @@ You can browse the documentation on the [Rejoice docs site](https://prinx.github
 
 ## Rejoice framework
 
-Retrieve the Rejoice framework [here](https://github.com/prinx/rejoice).
+Retrieve the Rejoice framework [here](https://github.com/rejoice-framework/rejoice).
 
 ## Contributing
 
