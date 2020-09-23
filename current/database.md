@@ -78,7 +78,7 @@ public function retrieveUser()
     $statement = $this->db()->prepare("SELECT * FROM users WHERE id = :user_id");
     $statement->execute(['user_id' => $id]);
 
-    $result = $statement->fetch(PDO::FETCH_ASSOC);
+    $result = $statement->fetch(\PDO::FETCH_ASSOC);
     $statement->closeCursor();
 
     return $result;
