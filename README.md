@@ -6,6 +6,7 @@ Rejoice building your USSD applications
 
 
 # Rejoice Docs
+
 This is the official documentation of the rejoice framework.
 
 You can browse the documentation on the [Rejoice docs site](https://rejoice-framework.github.io/docs).
@@ -19,4 +20,5 @@ Retrieve the Rejoice framework [here](https://github.com/rejoice-framework/rejoi
 Your contribution to Rejoice is very much appreciated.
 
 ## License
+
 [MIT License](LICENSE)

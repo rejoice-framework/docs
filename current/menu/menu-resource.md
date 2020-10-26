@@ -40,7 +40,7 @@ return [
 
     'menu_name' => [
         'message' => '',
-        
+
         'actions' => [
             '1' => [
                 'display'   => '',
@@ -71,7 +71,7 @@ return [
   
     'welcome' => [
         'message' => 'Welcome to the registration panel. Select an option',
-        
+
         'actions' => [
             '1' => [
                 'display'   => 'Register',
@@ -82,7 +82,7 @@ return [
   
     'enter_username' => [
         'message' => 'Kindly enter your name',
-        
+
         'actions' => [
             '0' => [
                 'display' => 'Back',
@@ -101,6 +101,7 @@ return [
 ```
 
 That's the whole application. But you have surely noticed that certain we could not replicate all the implementation from the menu classes:
+
 - The `welcome` menu was fully implemented.
 - On, the `enter_username` Everything was implemented, except from the `saveAs`. We will rely on the Menu class for that. (The menu resource and the class are compatible and can coexist.)
 - On the last menu, the `register_user` menu, we will also rely on the menu class to save the user in the database and also send the right response to the user (whether saving to the database was successful or not.) So the message is empty and actually we can delete it.
@@ -108,6 +109,7 @@ That's the whole application. But you have surely noticed that certain we could 
 We no more need the `welcome` menu class. It can be deleted as it is all handled in the menu resource.
 
 We still need the `EnterUsername` class and it will be:
+
 ```php
 namespace App\Menus;
 
@@ -129,7 +131,7 @@ class RegisterUser extends Menu
 {
     public function before()
     {
-        $name = $this->userPreviousResponses('enter_username');
+        $name = $this->previousResponses('enter_username');
 
         try {
             // Save the user name to the database here

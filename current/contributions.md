@@ -18,18 +18,20 @@ If you have discover a security vulnerability inside Rejoice, please DO NOT open
 
 ## Support and general questions
 If you need help or have a general question about rejoice, you can post it on:
-* [Stack Overflow], 
-* [Discord](https://discord.gg/92JVJUf).
+
+- [Stack Overflow],
+- [Discord](https://discord.gg/92JVJUf).
 
 The issue tracker is only for bugs and feature requests.
 
 ## <a name="code-of-conduct"></a>Code of conduct
+
 The Rejoice code of conduct is derived from the Laravel framework code of conduct. By participating, you are expected to uphold this code. Any violations of the code of conduct may be reported to Prince Dorcis (princedorcis@gmail.com):
 
-* Participants will be tolerant of opposing views.
-* Participants must ensure that their language and actions are free of personal attacks and disparaging personal remarks.
-* When interpreting the words and actions of others, participants should always assume good intentions.
-* Behavior that can be reasonably considered harassment will not be tolerated.
+- Participants will be tolerant of opposing views.
+- Participants must ensure that their language and actions are free of personal attacks and disparaging personal remarks.
+- When interpreting the words and actions of others, participants should always assume good intentions.
+- Behavior that can be reasonably considered harassment will not be tolerated.
 
 ## Fork & create a branch
 
@@ -95,10 +97,10 @@ git push --force-with-lease 732-fix-default-menu-not-used
 
 A PR can only be merged into master by a maintainer if:
 
-* It is passing CI.
-* It has been approved by a maintainer.
-* It has no requested changes.
-* It is up to date with current master.
+- It is passing CI.
+- It has been approved by a maintainer.
+- It has no requested changes.
+- It is up to date with current master.
 
 Any maintainer is allowed to merge a PR if all of these conditions are
 met.
@@ -107,8 +109,8 @@ met.
 
 Maintainers need to do the following to push out a release:
 
-* Switch to the master branch and make sure it's up to date.
-* Review and merge the PR. The generated changelog in the PR should include all user visible changes you intend to ship.
+- Switch to the master branch and make sure it's up to date.
+- Review and merge the PR. The generated changelog in the PR should include all user visible changes you intend to ship.
 
 [Stack Overflow]: http://stackoverflow.com/questions/tagged/rejoice
 [new issue]: https://github.com/rejoice/rejoice/issues/new

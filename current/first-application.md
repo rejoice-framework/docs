@@ -17,12 +17,14 @@ nav_order: 20
 - [Going further](#going-further)
 
 ## USSD menus
+
 A USSD application consists of Menus also known as Screens, that follow each other and process the user's interaction in a USSD session. Building a USSD application will be actually implementing this interactions with the user. Rejoice allows you to build the USSD menus and implement how the follow each other in a simple a beautiful way. It allows you to have full control on the user's interaction, the user's answer to each menu.
 
 Let's see how to create our USSD menus.
 All your menus will be in the app/Menus folder (or sub-folders).
 
 ## The default menus
+
 When you open the `app/Menus` folder, You will notice that there is already a `Menu.php` and a `Welcome.php` files in it. Those two are the minimum for every application.
 
 The `Menu.php` contains the `Menu` class which is the base menu class that all your menus will extend.
@@ -46,6 +48,7 @@ The `actions` methods defines the different available actions on the menu. For e
 The action method returns an array of actions called the `action bag`.
 
 Create the action method like this:
+
 ```php
 public function actions()
 {
@@ -57,9 +60,11 @@ public function actions()
     ];
 }
 ```
+
 As you can see an action bag is just a plain PHP array associating the expected user inputs to the next menus to call.
 Here the action bag contains only one action associating the user input `1` to the menu `enter_username`. The `display` property defines the explanatory text the user will see associated to the input.
 Our welcome menu looks like:
+
 ```php
 namespace App\Menus;
 
@@ -107,14 +112,14 @@ In the actions on the welcome menu, we defined that, if the user chooses `1` we 
 Open the console in the project root folder. Run the command:
 
 ```php
-php smile menu:new EnterUsername
+php smile make:menu EnterUsername
 ```
 
 This command will create a simple menu class in a newly created file `app/Menus/EnterUsername.php`.
 
 You can add the flag `-x` to the command to create the menu without the comments around the method.
 
-Run `php smile help menu:new` to see all the available flags that can help you modify the menu you are creating.
+Run `php smile help make:menu` to see all the available flags that can help you modify the menu you are creating.
 {: .note .note-info }
 
 You will notice that the name of the menu class is in `PascalCase` when the name in the action bag is in `snake_case`. This is intentional and just to show that Rejoice can automatically guess the name of the class from it. In a real application you may use the true name of the menu directly 'EnterUsername'. Note that `enter-username`, or even `enter username` in the action bag will also produce the same result.
@@ -231,20 +236,20 @@ Let's create that menu.
 
 Create a new menu called `RegisterUser`:
 ```php
-php smile menu:new RegisterUser -x
+php smile make:menu RegisterUser -x
 ```
 Replace the `message` method by:
 
 ```php
-public function message($userPreviousResponses)
+public function message($previousResponses)
 {
-    $name = $userPreviousResponses->get('enter_username');
+    $name = $previousResponses->get('enter_username');
 
     return "Thank you {$name}. You have successfully registered.";
 }
 ```
 
-The `$userPreviousResponses` argument is an object containing all the previous responses given by the user. You access a specific response by using its `get` method with the name of the menu as argument. Just make sure the name of the menu is the same used in the `next_menu` of the action bag or in the `defaultNextMenu` method.
+The `$previousResponses` argument is an object containing all the previous responses given by the user. You access a specific response by using its `get` method with the name of the menu as argument. Just make sure the name of the menu is the same used in the `next_menu` of the action bag or in the `defaultNextMenu` method.
 
 There are other slightly different ways of retrieving the user's response. Learn more about it [here](user-response).
 
@@ -262,7 +267,7 @@ class RegisterUser extends Menu
 {
     public function message()
     {
-        $name = $this->userPreviousResponses('enter_username');
+        $name = $this->previousResponses('enter_username');
 
         // Save the user name to the database here
 
@@ -282,7 +287,7 @@ class RegisterUser extends Menu
 {
     public function before()
     {
-        $name = $this->userPreviousResponses('enter_username');
+        $name = $this->previousResponses('enter_username');
 
         // Save the user name to the database here
     }
@@ -291,7 +296,7 @@ class RegisterUser extends Menu
     {
         // The message will then just display the feedback to the user.
 
-        $name = $this->userPreviousResponses('enter_username');
+        $name = $this->previousResponses('enter_username');
 
         return "Thank you {$name}. You have successfully registered.";
     }
@@ -307,7 +312,7 @@ class RegisterUser extends Menu
 
     public function before()
     {
-        $name = $this->userPreviousResponses('enter_username');
+        $name = $this->previousResponses('enter_username');
 
         try {
             // Save the user name to the database here
@@ -333,7 +338,7 @@ class RegisterUser extends Menu
 {
     public function before()
     {
-        $name = $this->userPreviousResponses('enter_username');
+        $name = $this->previousResponses('enter_username');
 
         try {
             // Save the user name to the database here

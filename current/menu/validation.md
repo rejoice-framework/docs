@@ -8,7 +8,7 @@ nav_order: 44
 <h1>Validation</h1>
 
 - [Validation](#validation)
-  - [In the menu entity](#in-the-menu-entity)
+  - [In the menu class](#in-the-menu-class)
     - [Using your custom validation logic](#using-your-custom-validation-logic)
     - [Using the user response validator instance](#using-the-user-response-validator-instance)
   - [In the menu flow](#in-the-menu-flow)
@@ -32,9 +32,9 @@ nav_order: 44
 ## Validation
 
 Rejoice has made it very easy to validate the user sent on each particular menu.
-You can validate directly inside the menu flow in the `resources/menus/menu.php` file or validate in the menu entity.
+You can validate directly inside the menu flow in the `resources/menus/menu.php` file or validate in the menu class.
 
-### In the menu entity
+### In the menu class
 
 #### Using your custom validation logic
 
@@ -48,7 +48,7 @@ class EnterAge extends Menu
         if ($age < 5 || $age > 150) {
             return false;
         }
-        
+
         return true;
     }
 }
@@ -72,7 +72,7 @@ class EnterAge extends Menu
 
             return false;
         }
-        
+
         return true;
     }
 }
@@ -95,7 +95,7 @@ class EnterAge extends Menu
         } elseif ($age > 150) {
             $this->addError('You must be less than 150 years to continue');
         }
-        
+
         return empty($this->error());
     }
 }
@@ -107,7 +107,7 @@ The user response validator is actually the class that the framework uses to aut
 
 ```php
 // Import the class
-use Prinx\Rejoice\UserResponseValidator as Validator;
+use Rejoice\UserResponseValidator as Validator;
 
 class EnterAge extends Menu
 {
@@ -118,10 +118,12 @@ class EnterAge extends Menu
       return Validator::validate($response, $rules);
   }
 }
-``` 
+```
+
 Or with the custom error messages:
+
 ```php
-use Prinx\Rejoice\UserResponseValidator as Validator;
+use Rejoice\UserResponseValidator as Validator;
 
 class EnterAge extends Menu
 {
@@ -137,9 +139,11 @@ class EnterAge extends Menu
     }
 }
 ```
+
 Or
+
 ```php
-use Prinx\Rejoice\UserResponseValidator as Validator;
+use Rejoice\UserResponseValidator as Validator;
 
 class EnterAge extends Menu
 {
@@ -161,9 +165,11 @@ class EnterAge extends Menu
     }
 }
 ```
+
 Or
+
 ```php
-use Prinx\Rejoice\UserResponseValidator as Validator;
+use Rejoice\UserResponseValidator as Validator;
 
 class EnterAge extends Menu
 {
@@ -179,9 +185,11 @@ class EnterAge extends Menu
     }
 }
 ```
+
 Or We can be less verbose by directly returning only the rules:
+
 ```php
-// No need to import the class the validator class
+// No need to import the validator class
 
 class EnterAge extends Menu
 {
@@ -195,6 +203,7 @@ class EnterAge extends Menu
     }
 }
 ```
+
 <div class="note note-warning">
 An empty validation rule will throw a `RuntimeException`.</div>
 
@@ -205,7 +214,7 @@ An empty validation rule will throw a `RuntimeException`.</div>
 return [
 
     'enter_age' => [
-        'message' => 'Enter your age',
+        'message'           => 'Enter your age',
         'validate'          => 'integer|min:5|max:150'
         'default_next_menu' => 'retrieve_birth_year',
     ]
@@ -221,7 +230,7 @@ Whatever action is specified in the `actions` parameter has the priority over th
 
 Some rules accept parameters. You specify the parameter by following the rule with **colon** (`:`) and the value of the parameter.
 
-In the case a rule requires multiple variables, you can pass the variables by seperating them with a **comma** (`,`). This means, **you cannot pass a colon or a comma as argument to a rule**. If you are required to pass a colon or a comma as argument, you must create a custom validation inside the menu entity.
+In the case a rule requires multiple variables, you can pass the variables by seperating them with a **comma** (`,`). This means, **you cannot pass a colon or a comma as argument to a rule**. If you are required to pass a colon or a comma as argument, you must create a custom validation inside the menu class.
 
 You can combine several rules by separating them with a pipe (`|`).
 These are the default rules you can use:
@@ -405,7 +414,7 @@ return [
 
 <div class="note note-info">The default format (j/n/Y) accepts dates like '1/5/2025', '07/6/2030', etc. (The date and month do not need the '0' at their begining.)</div>
 
-<div class="note note-info">In case you need to perform some calculation on the date, like check if the date is too old or too far from another date, you can use the methods in the Date Utilities class to perform the validation inside the menu entity.</div>
+<div class="note note-info">In case you need to perform some calculation on the date, like check if the date is too old or too far from another date, you can use the methods in the Date Utilities class to perform the validation inside the menu class.</div>
 
 ### tel
 

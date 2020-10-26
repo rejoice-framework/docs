@@ -6,35 +6,11 @@ nav_order: 70
 
 <h1>Connecting to the database</h1>
 
-## Configuring databases
-Application database connections in Rejoice are configured in the `config/database` folder.
+## Connections
+
+Application database connections in Rejoice are configured in the `config/database.php` file.
 
 You can define as many database connections as you want by giving each of them a name. There is a default database configured by default.
-
-This is an example of configuration:
-```php
-// config/database.php
-
-return [
-
-    'default' => [
-        'user'     => env('APP_DEFAULT_DB_USER', ''),
-        'password' => env('APP_DEFAULT_DB_PASS', ''),
-        'host'     => env('APP_DEFAULT_DB_HOST', ''),
-        'port'     => env('APP_DEFAULT_DB_PORT', ''),
-        'dbname'   => env('APP_DEFAULT_DB_NAME', ''),
-    ],
-
-    'log_db' => [
-        'user'     => env('LOG_DB_USER', ''),
-        'password' => env('LOG_DB_PASS', ''),
-        'host'     => env('LOG_DB_HOST', ''),
-        'port'     => env('LOG_DB_PORT', ''),
-        'dbname'   => env('LOG_DB_NAME', ''),
-    ]
-
-];
-```
 
 You will define the environment variables in the `.env` file in the root directory.
 
@@ -42,127 +18,377 @@ You will define the environment variables in the `.env` file in the root directo
 We do not recommend specifying the database credentials directly in the config files.
 </div>
 
-## Using a database connection
-Using a database connection in a menu class is as easy as calling the `db` method.
+## Creating Models
+
+Rejoice ships with the Eloquent ORM provided by the wonderful `illuminate/database` package which allows to create Models reflecting the tables in our database.
+
+A model can be created using the commands:
+
+```php
+php smile make:model Country
+```
+
+This command will create a class named `Country` in a newly created `app/Models/Country.php` file.
+
+This model is then automatically mapped to the `countries` table in the database. If the countries table has another name (for example `all_countries`), you can simply specify that name in the class:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Rejoice\Database\Model;
+
+class Country extends Model
+{
+    protected $table = 'all_countries';
+}
+```
+
+You can then start using like:
+
+```php
+public function before()
+{
+    $name = $this->previousResponses('ChooseCountry');
+    $countryCode = Country::where('name', '=', $name)->value('code');
+}
+```
+
+You can use all the wonderful features that come with the Eloquent ORM, like relationships, collections, mutators, etc. Learn more about Eloquent [here](laravel.com/docs/8.x/eloquent#eloquent-model-conventions).
+
+## Query Builder
+
+Together with the Eloquent ORM, you have access to the query builder simply by calling the `Rejoice/Database/DB` class.
+
+You can then use it like:
+
+```php
+public function before()
+{
+    $name = $this->previousResponses('ChooseCountry');
+    $countryCode = DB::table('all_countries')->where('name', '=', $name)->value('code');
+}
+```
+
+Learn more about Query Builder [here](https://laravel.com/docs/8.x/queries).
+
+## Using directly the PDO connection
+
+Getting the PDO connection is as easy as calling the `db` method.
 The db method takes one parameter which is the name of the connection you want to use.
 You can also call the `db` method without parameter. The `default` connection will be automatically used.
 The `db` method returns a `PDO` connection to the database. So you will use it exactly how a PDO connection is used, and using a plain query.
 These are some examples:
 
-### Inserting to the database
+## Inserting to the database
+
+### Using Eloquent
+
+Assuming we have created a `User` Model:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Rejoice\Database\Model;
+
+class User extends Model
+{
+}
+```
+
+Then in the menu class:
 
 ```php
 public function before()
 {
-    $name = $this->userPreviousResponses('enter_username');
+    $firstName = $this->previousResponses('EnterFirstName');
+    $lastName = $this->previousResponses('EnterLastName');
 
-    $statement = $this->db()->prepare("INSERT INTO users (name) VALUES (?)");
-    $statement->execute([$name]);
-    $statement->closeCursor();
-
-    $logStatement = $this->db('log_db')->prepare("INSERT INTO logs (log_text) VALUES (?)");
-    $logStatement->execute(["User {$name} has been created"]);
-    $logStatement->closeCursor();
+    $user = new User;
+    $user->first_name = $firstName;
+    $user->last_name = $lastName;
+    $user->save();
 }
 ```
 
-The first insertion uses the default database connection. The second uses the log database configurations.
-
-### Retrieving from the database
+We can do the same via mass-assignement by defining the attributes that will be mass-assignable in the `fillable` property of the model:
 
 ```php
-public function retrieveUser()
+<?php
+
+namespace App\Models;
+
+use Rejoice\Database\Model;
+
+class User extends Model
 {
-    $id = $this->userPreviousResponses('choose_user');
-
-    $statement = $this->db()->prepare("SELECT * FROM users WHERE id = :user_id");
-    $statement->execute(['user_id' => $id]);
-
-    $result = $statement->fetch(\PDO::FETCH_ASSOC);
-    $statement->closeCursor();
-
-    return $result;
+    protected $fillable = [
+        'first_name', 'last_name'
+    ];
 }
+```
 
+Then in our menu:
+
+```php
+public function before()
+{
+    $firstName = $this->previousResponses('EnterFirstName');
+    $lastName = $this->previousResponses('EnterLastName');
+
+    $user = User::create([
+        'first_name' => $firstName,
+        'last_name'  => $lastName,
+    ]);
+}
+```
+
+### Using Query Builder
+
+```php
+public function before()
+{
+    $firstName = $this->previousResponses('EnterFirstName');
+    $lastName = $this->previousResponses('EnterLastName');
+
+    DB::table('users')->insert([
+        'first_name' => $firstName,
+        'last_name' => $lastName,
+    ]);
+}
+```
+
+### Using PDO connection
+
+```php
+public function before()
+{
+    $firstName = $this->previousResponses('EnterFirstName');
+    $lastName = $this->previousResponses('EnterLastName');
+
+    $statement = $this->db()->prepare("INSERT INTO users (first_name, last_name) VALUES (:first_name, :last_name)");
+    $statement->execute([
+        'first_name' => $firstName,
+        'last_name' => $lastName,
+    ]);
+    $statement->closeCursor();
+}
+```
+
+## Retrieving from the database
+
+### Using Eloquent
+
+```php
 public function message()
 {
-    $user = $this->retrieveUser();
-    $message = $user ? "Hello {$user['name']}" : "User not found"; 
-    
+    $id = $this->previousResponses('choose_user');
+
+    $user = User::find($id);
+
+    $message = $user ? "Hello {$user->first_name}" : "User not found";
+
     return $message;
 }
 ```
-Here we used another similar PDO syntax to prepare the query. Notice how the `user_id` is named in the query and referenced in the `execute` method. This is just to show this syntax. Having only one variable (`user_id`), using the question mark syntax would have been easier. We will prefer the `named` variable syntax when we have more variables.
 
-### Updating the database
-
-```php
-public function before()
-{
-    $name = $this->userPreviousResponses('edit_username');
-
-    $statement = $this->db()->prepare("UPDATE users SET name = ?");
-    $statement->execute([$name]);
-    $statement->closeCursor();
-}
-```
-### Deleting from the database
+### Using Query Builder
 
 ```php
-public function before()
+public function message()
 {
-    $name = $this->userPreviousResponses('edit_username');
+    $id = $this->previousResponses('choose_user');
 
-    $statement = $this->db()->prepare("DELETE * FROM users WHERE name = ?");
-    $statement->execute([$name]);
-    $statement->closeCursor();
+    $user = DB::table('users')->where('id', '=', $id)->get();
+
+    $message = $user ? "Hello {$user->first_name}" : "User not found";
+
+    return $message;
 }
 ```
 
-### Transactions
+### Using PDO connection
+
+```php
+public function message()
+{
+    $id = $this->previousResponses('choose_user');
+
+    $statement = $this->db()->prepare("SELECT * FROM users WHERE id = ?");
+    $statement->execute([$id]);
+
+    $user = $statement->fetch(\PDO::FETCH_ASSOC);
+
+    $statement->closeCursor();
+
+    $message = $user ? "Hello {$user['first_name']}" : "User not found";
+
+    return $message;
+}
+```
+
+## Updating the database
+
+### Using Eloquent
 
 ```php
 public function before()
 {
-    $name = $this->userPreviousResponses('enter_username');
+    $id = $this->previousResponses('choose_user');
 
+    User::where('id', $id)->update(['active' => 0]);
+}
+```
+
+### Using Query Builder
+
+```php
+public function before()
+{
+    $id = $this->previousResponses('choose_user');
+
+    DB::table('users')->where('id', $id)->update(['active' => 0]);
+}
+```
+
+### Using PDO connection
+
+```php
+public function before()
+{
+    $id = $this->previousResponses('choose_user');
+
+    $statement = $this->db()->prepare("UPDATE users SET active = 0 WHERE id = ?");
+    $statement->execute([$id]);
+    $statement->closeCursor();
+}
+```
+
+## Deleting from the database
+
+### Using Eloquent
+
+```php
+public function before()
+{
+    $id = $this->previousResponses('choose_user');
+
+    User::where('id', $id)->delete();
+}
+```
+
+### Using Query Builder
+
+```php
+public function before()
+{
+    $id = $this->previousResponses('choose_user');
+
+    DB::table('users')->where('id', $id)->delete();
+}
+```
+
+### Using PDO connection
+
+```php
+public function before()
+{
+    $id = $this->previousResponses('choose_user');
+
+    $statement = $this->db()->prepare("DELETE * FROM users WHERE id = ?");
+    $statement->execute([$id]);
+    $statement->closeCursor();
+}
+```
+
+## Transactions
+
+### Using the `transaction` method
+
+The `DB` class provides a handful `transaction` method to manage transactions.
+
+```php
+public function before()
+{
+    DB::transaction(function () {
+        // First query
+        // Second query
+        // ...
+    });
+}
+```
+
+Committing or rolling back are automatically handled by the `transaction` method.
+
+The `transaction` method accepts a second argument that is the number of times the transaction will be retried if it failed.
+
+```php
+public function before()
+{
+    $retry = 3;
+
+    DB::transaction(function () {
+        // First query
+        // Second query
+        // ...
+    }, $retry);
+}
+```
+
+An exception will be thrown if all the attempts are exhausted.
+
+### Manually handling committing and rolling back
+
+If for any reason you want to manually handle committing and rolling back, you can easily do it:
+
+```php
+public function before()
+{
     $this->db()->beginTransaction();
 
     try {
-        $statement = $this->db()->prepare("INSERT INTO users (name) VALUES (?)");
-        $statement->execute([$name]);
-        $statement->closeCursor();
+        // First query
+        // Second query
+        // ...
 
         $this->db()->commit();
-        $this->respond("Your information has been successfully saved.");
+
+        $this->respond("Operation successful.");
     } catch (\Throwable $th) {
-        $this->db()->rollBack();       
+        $this->db()->rollBack();
+
         $this->respond("An error happened.");
     }
 }
 ```
 
+<div class="note note-info">
+Instead of `$this->db()->beginTransaction()`, you can also use `DB::beginTransaction()`. Same for `$this->db()->commit()` and `$this->db()->rollBack()`.
+</div>
+
 We are using the `respond` method to send the response to the user. This implies this screen will be the last screen.
 
 If you want to do the same thing on a screen that is not the last screen, you can do:
+
 ```php
 protected $nameSavedSuccessfuly = false;
 
 public function before()
 {
-    $name = $this->userPreviousResponses('enter_username');
-
     $this->db()->beginTransaction();
 
     try {
-        $statement = $this->db()->prepare("INSERT INTO users (name) VALUES (?)");
-        $statement->execute([$name]);
-        $statement->closeCursor();
+        // First query
+        // Second query
+        // ...
 
         $this->db()->commit();
         $this->nameSavedSuccessfuly = true;
     } catch (\Throwable $th) {
-        $this->db()->rollBack();       
+        $this->db()->rollBack();
     }
 }
 

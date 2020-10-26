@@ -6,28 +6,29 @@ nav_order: 43
 ---
 <h1>Actions</h1>
 
-- [The actoin bag](#the-actoin-bag)
-  - [The actions](#the-actions)
-  - [The action trigger](#the-action-trigger)
-  - [Actions properties](#actions-properties)
-    - [The display property](#the-display-property)
-    - [The next_menu property](#the-next_menu-property)
-    - [The save_as property](#the-save_as-property)
-  - [Default next menu](#default-next-menu)
-  - [Predefined next menus - Magic menus](#predefined-next-menus---magic-menus)
-  - [Inserting predefined actions](#inserting-predefined-actions)
-    - [Inserting Back action](#inserting-back-action)
-    - [Inserting Welcome action](#inserting-welcome-action)
-    - [Inserting Paginate forward action](#inserting-paginate-forward-action)
-    - [Inserting Paginate back action](#inserting-paginate-back-action)
-  - [Later menu](#later-menu)
-  - [Calling a remote USSD application](#calling-a-remote-ussd-application)
+- [Introduction](#introduction)
+- [The action bag](#the-action-bag)
+- [The actions](#the-actions)
+- [The action trigger](#the-action-trigger)
+- [Actions properties](#actions-properties)
+  - [The display property](#the-display-property)
+  - [The `next_menu` property](#the-next_menu-property)
+  - [The `save_as` property](#the-save_as-property)
+- [Default next menu](#default-next-menu)
+- [Predefined next menus - Magic menus](#predefined-next-menus---magic-menus)
+- [Inserting predefined actions](#inserting-predefined-actions)
+  - [Inserting Back action](#inserting-back-action)
+  - [Inserting Welcome action](#inserting-welcome-action)
+  - [Inserting Paginate forward action](#inserting-paginate-forward-action)
+  - [Inserting Paginate back action](#inserting-paginate-back-action)
+- [Later menu](#later-menu)
+- [Calling a remote USSD application](#calling-a-remote-ussd-application)
 
 ## Introduction
 
 Actions allowed the user to navigate through your application and allow us to get information from the user.
 
-# The actoin bag
+## The action bag
 
 All the actions on a menu are contained in an array called actions bag. The action bag is either returned by the `actions` method of the menu class or is the value of the `actions` index in the menu resource of the specific menu.
 
@@ -57,6 +58,7 @@ return [
 ```
 
 In a menu class:
+
 ```php
 public function actions()
 {
@@ -73,6 +75,7 @@ public function actions()
     return $actions;
 }
 ```
+
 An integer also will work as action trigger and may be useful for automatically reodering the actions whenever you make a change. But note that the first action displayed will be `0`.
 {: .note note-info }
 
@@ -81,11 +84,13 @@ An integer also will work as action trigger and may be useful for automatically 
 An action has several properties that allow us to have full control on the navigation in our application and full control over the interaction with the user, especially when requesting information from the user.
 
 These are the properties that an action can take:
+
 - `display`
 - `next_menu`
 - `save_as`
 
 ### The display property
+
 The display property of the action is an very short text indicating what is the action about. It is the text that will be displayed alongside the action trigger on the user's phone.
 
 ```php
@@ -121,7 +126,7 @@ This will render as:
     </table>
 </div>
 
-### The next_menu property
+### The `next_menu` property
 
 The next menu property of an action is the property that allows us to implement navigation through our menus. It configuration is simple as providing the name of the menu we want to go to.
 
@@ -183,7 +188,7 @@ class ShowProfile extends Menu
 
 These assume that classes `ShowProfile` and `DeleteProfile` exist in the `app/Menus/UserProfile` folder.
 
-### The save_as property
+### The `save_as` property
 
 The `save_as` property allows us to modify the response of the user before it is saved in the session.
 
@@ -228,17 +233,17 @@ class ProcessPayment extends Menu
 {
     public function actions()
     {
-        $paymentOption = $userPreviousResponses->get('payment_option');
+        $paymentOption = $previousResponses->get('payment_option');
 
         switch ($paymentOption) {
             case 'pay_via_mobile_money':
-                    // Return a custom action 
+                    // Return a custom action
                 break;
             case 'pay_via_cheque':
-                    // Return a custom action 
+                    // Return a custom action
                 break;
             case 'pay_via_paypal':
-                    // Return a custom action 
+                    // Return a custom action
                 break;
         }
     }
@@ -260,14 +265,15 @@ You can learn about user response validation [here](validation).
 
 On such menus, we can no more define a next menu in the actions bag. So we need a way to allow the user to send any value even though it is not specified in the actions bag. It is possible by defining the property `default_next_menu` directly in the menu (and not in the actions) or by using the `defaultNextMenu` in the menu class.
 
-You configure the `default_next_menu` the exact way the `next_menu` property of an action is configured. It means the `default_next_menu` will just contain the name of the next menu we want to go to. In a menu class, the `defaultNextMenu` will return the name or the next menu. 
+You configure the `default_next_menu` the exact way the `next_menu` property of an action is configured. It means the `default_next_menu` will just contain the name of the next menu we want to go to. In a menu class, the `defaultNextMenu` will return the name or the next menu.
 
 ## Predefined next menus - Magic menus
 
 Rejoice provides and automatically handles some predefined menu for you to allow you to concentrate on the actual application menus. Those menus are called **magic menus**. Their names starts with double undescore.
 
-These are all the magic menus that Rejoice ships with.
-- `__back` for going back.
+These are all the magic menus that Rejoice ships:
+
+- `__back` for going back
 - `__welcome` for returning to the main menu
 - `__end` to return a last menu message (a.k.a end the session)
 - `__same` for displaying the same menu again
@@ -275,16 +281,17 @@ These are all the magic menus that Rejoice ships with.
 - `__paginate_back` for implementing a back pagination (this is used by the [Paginator](#implementing-pagination))
 
 Those are the magic menus you can use directly in your application to navigate. There are other magic menus that are reserved to the framework:
+
 - `__split_next` When a menu overflows, Rejoice automatically detects it and splits it under the hood for you. `__split_next` is the name that will be used to reference any next screen of the splitted menu.
 - `__split_back` will be used to reference any back screen of a splitted menu.
 - `__continue_last_session` The name of the *continue from last session* menu.
 
 <div class="note note-danger">It is highly recommended not to name any of your own menu with double underscore at the beginning!</div>
 
-
 ## Inserting predefined actions
 
 The available predefined actions are:
+
 - backAction
 - mainMenuAction
 - paginateForwardAction
@@ -299,22 +306,23 @@ namespace App\Menus;
 
 class ProcessBalanceRequest extends Menu
 {
-  public function actions($userPreviousResponses)
-  {
-    $actions = [
-      // Define some actions here (or not)
-      
-      // Back action
-      '0' => [
-        'display' => 'Back',
-        'next_menu' => '__back',
-      ]
-    ];
+    public function actions($previousResponses)
+    {
+        $actions = [
+            // Define some actions here (or not)
 
-    return $actions;
-  }
+            // Back action
+            '0' => [
+                'display' => 'Back',
+                'next_menu' => '__back',
+            ]
+        ];
+
+        return $actions;
+    }
 }
 ```
+
 The trigger is `0` and the message attached is `Back`.
 
 or
@@ -324,7 +332,7 @@ namespace App\Menus;
 
 class ProcessBalanceRequest extends Menu
 {
-    public function actions($userPreviousResponses)
+    public function actions($previousResponses)
     {
         $actions = [
             //
@@ -343,7 +351,7 @@ namespace App\Menus;
 
 class ProcessBalanceRequest extends Menu
 {
-    public function actions($userPreviousResponses)
+    public function actions($previousResponses)
     {
         $actions = [
             //
@@ -355,12 +363,13 @@ class ProcessBalanceRequest extends Menu
 ```
 
 If only the back action will be displayed, you can directly return the back action.
+
 ```php
 namespace App\Menus;
 
 class ProcessBalanceRequest extends Menu
 {
-    public function actions($userPreviousResponses)
+    public function actions($previousResponses)
     {
         return $this->backAction();
     }
@@ -369,17 +378,19 @@ class ProcessBalanceRequest extends Menu
 
 The backAction method can take two arguments, the trigger and the display message associated.
 By default the trigger is `0` and the display message is `Back`.
+
 ```php
 namespace App\Menus;
 
 class ProcessBalanceRequest extends Menu
 {
-    public function actions($userPreviousResponses)
+    public function actions($previousResponses)
     {
         return $this->backAction('99', 'Previous menu');
     }
 }
 ```
+
 The method will return the exact array that we harcoded in the first example.
 You can modify the trigger by passing your custom trigger to the method as first parameter. You can custom the message attached by passing the sustom message as second parameter.
 
@@ -392,7 +403,7 @@ namespace App\Menus;
 
 class ProcessBalanceRequest extends Menu
 {
-    public function actions($userPreviousResponses)
+    public function actions($previousResponses)
     {
         $actions = [
             //...
@@ -407,6 +418,7 @@ class ProcessBalanceRequest extends Menu
     }
 }
 ```
+
 The trigger is `00` and the message attached is `Main menu`.
 
 Or
@@ -416,7 +428,7 @@ namespace App\Menus;
 
 class ProcessBalanceRequest extends Menu
 {
-    public function actions($userPreviousResponses)
+    public function actions($previousResponses)
     {
         $actions = [
             //
@@ -428,17 +440,19 @@ class ProcessBalanceRequest extends Menu
 ```
 
 If only the main menu action will be displayed, you can directly return it.
+
 ```php
 namespace App\Menus;
 
 class ProcessBalanceRequest extends Menu
 {
-    public function actions($userPreviousResponses)
+    public function actions($previousResponses)
     {
         return $this->mainMenuAction();
     }
 }
 ```
+
 The `mainMenuAction` method can take two arguments, the trigger and the display message associated.
 By default the trigger is `00` and the display message is `Main menu`.
 
@@ -451,7 +465,7 @@ namespace App\Menus;
 
 class ProcessBalanceRequest extends Menu
 {
-    public function actions($userPreviousResponses)
+    public function actions($previousResponses)
     {
         $actions = [
             //...
@@ -466,6 +480,7 @@ class ProcessBalanceRequest extends Menu
     }
 }
 ```
+
 Since we are going back, we are using the same trigger and message attached as the normal go-back action. The trigger is `0` and the message attached is `Back`.
 
 or
@@ -475,7 +490,7 @@ namespace App\Menus;
 
 class ProcessBalanceRequest extends Menu
 {
-    public function actions($userPreviousResponses)
+    public function actions($previousResponses)
     {
         $actions = [
             //
@@ -495,11 +510,11 @@ namespace App\Menus;
 
 class ProcessBalanceRequest extends Menu
 {
-    public function actions($userPreviousResponses)
+    public function actions($previousResponses)
     {
         $actions = [
             //...
-        
+
             '0' => [
                 'display' => 'Back',
                 'next_menu' => '__paginate_back',
@@ -510,6 +525,7 @@ class ProcessBalanceRequest extends Menu
     }
 }
 ```
+
 Since we are going back, we are using the same trigger and message attached as the normal go-back action. The trigger is `0` and the message attached is `Back`.
 
 or
@@ -519,7 +535,7 @@ namespace App\Menus;
 
 class ProcessBalanceRequest extends Menu
 {
-    public function actions($userPreviousResponses)
+    public function actions($previousResponses)
     {
         $actions = [
             //
@@ -533,6 +549,7 @@ class ProcessBalanceRequest extends Menu
 ## Later menu
 
 Later menu is a powerful concept that helps you to modify the normal flow of the menu. Actually, every menu defined is attached to another menu through the `next_menu` parameter. It restrict you to use a menu for a specific purpose out of it flow. The later menu bypass that limitation and allows you to call a menu outside of its flow. View from other side, it allows us to create a menu that is not dependent on a particular flow but is rather *alone* and used by multiple flows. This is a scenario to help understand the concept and a use case of a later menu.
+
 ```php
 // resources/menus/menus.php
 
@@ -557,6 +574,7 @@ return [
 ```
 
 In a menu class:
+
 ```php
 // app/Menus/chooseOptionScreen.php
 
@@ -607,6 +625,7 @@ return [
 ```
 
 In a menu class:
+
 ```php
 // app/Menus/EnterUsername.php
 
@@ -618,7 +637,7 @@ class EnterUsername extends Menu
     {
         return 'Kindly enter your name';
     }
-    
+
     public function defaultNextMenu()
     {
         return [
@@ -630,6 +649,7 @@ class EnterUsername extends Menu
 ```
 
 ## Calling a remote USSD application
+
 You can call a remote USSD simply by setting the URL of the USSD application as *next_menu* to an action.
 
 ```php
@@ -649,7 +669,9 @@ return [
 
 ];
 ```
+
 In a menu class:
+
 ```php
 // app/Menus/ChooseOptionScreen.php
 
@@ -673,5 +695,6 @@ class ChooseOptionScreen extends Menu
     }
 }
 ```
+
 <div class="note note-warning">
 It's important to know that as soon as the USSD has switched to a remote USSD, all subsequent requests will be routed to that remote USSD and this current USSD will be just a relay. No menu of the current USSD can be called again. Everything happens as if the current USSD application has completely handed over to the remote USSD.</div>

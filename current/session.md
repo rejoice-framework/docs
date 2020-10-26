@@ -26,16 +26,20 @@ You can configure the session in the `config/session.php` file. But typically, n
 ## Session driver
 
 Rejoice supports two drivers for the sessions: file and database. They are basically where the session data will be saved.
+
 - For file session, no extra configuration is needed.
 - For database session, you will need to provide the database configuratons.
 
 No matter which driver you are using, interacting with the session is exactly the same.
 
 You can configure the session in the `.env` file:
+
 ```java
 SESSION_DRIVER=file
 ```
+
 Or provide the session database configurations:
+
 ```java
 SESSION_DRIVER=database
 
@@ -49,6 +53,7 @@ USSD_SESSION_DB_NAME=
 ## Setting a session variable
 
 You can easily save a variable in the session by using the `sessionSave` method.
+
 ```php
 $this->sessionSave('user_firstname', 'prince');
 ```
@@ -59,15 +64,19 @@ You can save arrays in the session.
 ## Getting a session variable
 
 You can easily retrieve a variable from the session by using the `sessionGet` method.
+
 ```php
 $firstname = $this->sessionGet('user_firstname');
 ```
+
 You can use its shortcut `session` method:
+
 ```php
 $firstname = $this->session('user_firstname');
 ```
 
 You can pass a default value (both to `session` and `sessionGet`) that will be returned in case the parameter specify does not exist in the session.
+
 ```php
 $firstname = $this->session('user_firstname', 'Guest');
 
@@ -92,11 +101,13 @@ if ($this->sessionHas('user_firstname')) {
 ## Removing a session variable
 
 You can easily remove a variable from the session by using the `sessionRemove` method.
+
 ```php
 $this->sessionRemove('user_firstname');
 ```
 
 ## Handling the last screen timeout
+
 <div class="note note-info">This section applies only to the last screen sent to the user.</div>
 
 By default, the Rejoice send the menu screen to the user's phone based on the configured `message` and `actions` (both in the menus.php ressource file and in the menu class). But sometimes, the last screen does not show up and the user rather gets a `connection`[`MMI`](glossary#mmi) error.
@@ -113,39 +124,47 @@ This section applies only to the last menu screen sent to the user.
 Rejoice takes care of discarding the session for us on a last screen. But sometimes, it is uselful to discard the session ourself, may it be to send the response to the user and being able to continue a business logic, or we need to send another push request to the user's phone (another USSD-like request passing by the mobile operator), or we need to call an API that will take long to respond or any other reason. Rejoice provides some in-built method to easily do it.
 
 ### Send the response and continue the script
+
 We need the `respond` method:
+
 ```php
 class ProcessBalanceRequest extends Menu
 {
-    public function before($userPreviousResponses)
+    public function before($previousResponses)
     {
       $this->respond('Your request is been processed');
-      
+
       // Continue the script (insert in database, call an API, etc.)
     }
 }
 ```
+
 Instead of the `respond` method, we can use:
+
 ```php
 $this->respondAndContinue('Your request is been processed');
 ```
+
 or
+
 ```php
 $this->softEnd('Your request is been processed');
 ```
+
 The three methods (`respond`, `respondAndContinue`, `softEnd`) are aliases. Just choose the one you like.
 
 ### Send the response and terminate the script
+
 ```php
 class ProcessBalanceRequest extends Menu
 {
-    public function before($userPreviousResponses)
+    public function before($previousResponses)
     {
         // Your business logic here
 
         // Sends the response and exit the script automatically
         $this->terminate('Your request is been processed'); 
-        
+
         // Anything here will not run
     }
 }
@@ -156,8 +175,11 @@ Instead of the `terminate` method, we can use:
 ```php
 $this->respondAndExit('Your request is been processed');
 ```
+
 or
+
 ```php
 $this->hardEnd('Your request is been processed');
 ```
+
 The three methods (`terminate`, `respondAndExit`, `hardEnd`) are aliases. Just choose the one you like.
