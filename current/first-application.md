@@ -18,14 +18,14 @@ nav_order: 20
 
 ## USSD menus
 
-A USSD application consists of Menus also known as Screens, that follow each other and process the user's interaction in a USSD session. Building a USSD application will be actually implementing this interactions with the user. Rejoice allows you to build the USSD menus and implement how the follow each other in a simple a beautiful way. It allows you to have full control on the user's interaction, the user's answer to each menu.
+A USSD application consists of Menus also known as Screens, that follow each other and process the user's interaction in a USSD session. Building a USSD application will be actually implementing this interactions with the user. Rejoice allows you to build the USSD menus and implement how they follow each other in a simple and beautiful way. It allows you to have full control on the user's interaction, the user's answer to each menu.
 
 Let's see how to create our USSD menus.
 All your menus will be in the app/Menus folder (or sub-folders).
 
 ## The default menus
 
-When you open the `app/Menus` folder, You will notice that there is already a `Menu.php` and a `Welcome.php` files in it. Those two are the minimum for every application.
+When you open the `app/Menus` folder, You will notice that there is already existing `Menu.php` and a `Welcome.php` files in it. Those two are the minimum for every application.
 
 The `Menu.php` contains the `Menu` class which is the base menu class that all your menus will extend.
 
