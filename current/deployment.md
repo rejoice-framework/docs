@@ -14,6 +14,7 @@ nav_order: 30
 The USSD protocol is highly linked to telecommunication environment of each country. Each request passes through a mobile operator before reaching the application. Hence, you (or your organization) must be in partnership with at least one (ideally all) the mobile operator of your country to be able to process a USSD request.
 
 ## USSD request parameters
+
 If you are already in a partnership with a mobile operator, they have surely given you some requests paramters you should wait for from them and the ones you should send to them on each request. This can differ from country to country. The default USSD parameters have been tailored to Ghana. But Rejoice lets you quickly change the parameters if they are different from from what your mobile operators provide. This can be changed in the .env file:
 
 ```ini
@@ -51,4 +52,5 @@ The user's phone number.
 The network MNC of the user's mobile operator.
 
 ## You don't do USSD like that?
+
 If the way you do USSD in your country is still completely different from what Rejoice provides, kindly create a pull request or just send an email to princedorcis@gmail.com explaining how you do it at your side. We are ready to integrate it to Rejoice :)

@@ -31,14 +31,17 @@ nav_order: 140
 - [Going further](#going-further)
 
 ## Creating a command
+
 ```php
-php smile command:new MyCommand
+php smile make:command MyCommand
 ```
 
 Will create a new command in the `app/Console/Commands`{:.php} folder.
 
 ## Configuring the command
+
 It helps you set the name of the command, the help message associated, the arguments the command takes, the options the command takes.
+
 ```php
 public function configure()
 {
@@ -70,20 +73,25 @@ public function configure()
         );
 }
 ```
+
 The `addArgument` method takes three parameters:
-* The name of the argument,
-* A constant specifying if the argument is required or not:
-  * `Argument::OPTIONAL`,
-  * `Argument::REQUIRED`
-* and a description of the variable that will be display aside the argument in the help message.
+
+- The name of the argument,
+- A constant specifying if the argument is required or not:
+  - `Argument::OPTIONAL`,
+  - `Argument::REQUIRED`
+- and a description of the variable that will be display aside the argument in the help message.
 
 You need to import the class:
+
 ```php
-use Prinx\Rejoice\Console\Argument;
+use Rejoice\Console\Argument;
 ```
+
 You can add as many arguments as you want.
 
 ### Adding options
+
 ```php
 public function configure()
 {
@@ -104,21 +112,26 @@ public function configure()
         );
 }
 ```
+
 The `addOption` method takes four parameters.
+
 - The name of the option
 - A one-letter shortcut for the option
 - A constant specifying if the option is required or not. The possible values are:
   - `Option::OPTIONAL`
-  -  `Option::REQUIRED`
+  - `Option::REQUIRED`
 - And the default value of the option.
 
 You need to import the class:
+
 ```php
-use Prinx\Rejoice\Console\Option;
+use Rejoice\Console\Option;
 ```
+
 You can add as many options as you want.
 
 ## The fire method
+
 ```php
 public function fire()
 {
@@ -140,18 +153,23 @@ $this->write('Cool');
 // end with a new line
 $this->writeln('Cool');
 ```
+
 The variable in writeln can be an array of string. Each string will be displayed on a new line.
+
 ```php
 $this->writeln(['Hi Prince!', 'This is amazing.']);
 ```
 
 ## Display in color
+
 ```php
 $this->writeWithColor('Cool', 'red', 'cyan');
 ```
+
 The first color is the foreground color. The second, the background color. Both are optional. The default is white for the foreground, black for the background.
 
 ### Supported colors
+
 - <span class="color-box white"></span> white
 - <span class="color-box black"></span> black
 - <span class="color-box red"></span> red
@@ -160,8 +178,9 @@ The first color is the foreground color. The second, the background color. Both 
 - <span class="color-box blue"></span> blue
 - <span class="color-box magenta"></span> magenta
 - <span class="color-box cyan"></span> cyan
-        
+
 ### Get a colorized string
+
 If you don't want to write directly but rather want to get the colorized string in a variable, you can use the `colorize` method.
 
 ```php
@@ -169,7 +188,9 @@ $greetings = $this->colorize('Cool', 'red', 'cyan');
 ```
 
 ## Colors helper methods
+
 ### Display a green text:
+
 ```php
 $this->info('Cool');
 $this->success('Cool');
@@ -179,6 +200,7 @@ $this->writeWithColor('Cool', 'green', 'black');
 ```
 
 ### Error text
+
 ```php
 $this->error('Uhhh');
 
@@ -187,6 +209,7 @@ $this->writeWithColor('Uhhh', 'white', 'red');
 ```
 
 ### Question
+
 ```php
 $this->question('Why?');
 
@@ -195,7 +218,9 @@ $this->writeWithColor('Why?', 'black', 'cyan');
 ```
 
 ## Tables
+
 ## Create a table
+
 ```php
 $table = $this->table()
     ->body([
@@ -205,7 +230,9 @@ $table = $this->table()
     ])
     ->show(); // Display the table
 ```
+
 Or define the rows one by one:
+
 ```php
 $table = $this->table()
     ->addRow([ 1, 'Edna',   22 ])
@@ -232,6 +259,7 @@ $table = $this->table()
 ### Separation line
 
 By default the rows are not separated by a line. To show a separtion line use the `tableLine` method.
+
 ```php
 $table = $this->table()
     ->head(['ID', 'Name', 'Age'])
@@ -245,12 +273,15 @@ $table = $this->table()
 ```
 
 ### Table header and footer titles
+
 ```php
 $table->headTitle('Users')
 $table->footTitle('Page 1/2')
 $table->show();
 ```
+
 ### Control the border style
+
 ```php
 // Default
 $table->border('default')
@@ -269,24 +300,30 @@ $table->border('all-double')
 
 $table->show();
 ```
+
 ## Ask question
+
 ```php
 $filename = $this->ask('What is the file name?');
 ```
+
 The `ask` method returns the response given by the user.
 
 ## Ask for confirmation
+
 ```php
 if ($this->confirm('Do you want to overwrite this file?', 'no');) {
     //
 }
 ```
+
 Takes as first argument, the question and as second argument the default response.
 The default response must be one of: `y`, `yes`, `n`, `no`.
 
 ## The input object
 
 The input of the user is represented by an object that Smile uses under the hood to retrieve the arguments and options provided by the user. For advanced manipulation of the command, you may need to use this object. You can retrieve it by:
+
 ```php
 $input = $this->getInput();
 ```
@@ -294,9 +331,11 @@ $input = $this->getInput();
 ## The output object
 
 The output object controls what the command will display and how it will be displayed. It is the object use under the hood when calling a method like `writeln`. For advanced manipulation of the command, you may need to use this object. You can retrieve it by:
+
 ```php
 $output = $this->getOutput();
 ```
 
 ## Going further
+
 You customize more your command by visiting the awesome Symfony Console documentation. Smile is fully based on Symfony Console.

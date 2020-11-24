@@ -7,140 +7,187 @@ nav_order: 100
 <h1>Pagination</h1>
 
 - [Implementing pagination](#implementing-pagination)
-  - [The `Paginator` trait](#the-paginator-trait)
-  - [The paginator required methods](#the-paginator-required-methods)
-    - [`PaginationFetch`](#paginationfetch)
-    - [`PaginationCountAll`](#paginationcountall)
-    - [`itemAction`](#itemaction)
-
+  - [Eloquent Pagination (Recommended)](#eloquent-pagination-recommended)
 
 ## Implementing pagination
-### The `Paginator` trait
-To implement pagination, you will probably need to use the paginator trait. It allows you to quickly deploy a paginable menu.
 
-Note: The `Rejoice` framework handles two types of pagination.
-The first one that we call `soft-pagination` is when all the data is retrieved and passed to the framework. It works fine when the data to paginate is small.
-The second type of pagination called the `hard-pagination` is the one that requires the use of the first one is when a menu overflows
+Rejoice allows you to quickly create a paginable menu. The recommend way to implement a paginable menu is by using the Eloquent ORM. But you can also create the same menu using directly SQL queries.
 
-### The paginator required methods
-#### `PaginationFetch`
-Retrieve the data from the database. Must return the retrieved data.
+This is a typical scenario:
 
-#### `PaginationCountAll`
-Must Return the total of rows fetched from the database.
+- We want the user to select his country.
+- We assume the user has selected his continent in the previous menu (named `SelectContinent`).
 
-#### `itemAction`
-When using the paginator trait, instead of the `actions` methods, you will use the `itemAction` method to specify how to insert the actions in your menu. This method will be used under the hood by the actions method to insert the actions automatically for you. 
-**Example**
+This is how we will implement such a menu with the help of the eloquent paginator trait.
+
+### Eloquent Pagination (Recommended)
+
+Create the menu class by using:
+
 ```php
+php smile make:menu SelectCountry -p
+```
+
+This command will generate a paginable menu in the `Menus` directory:
+
+```php
+
 namespace App\Menus;
 
-use Prinx\Rejoice\Menu\Paginator;
+use App\Menus\Menu;
+use Rejoice\Menu\EloquentPaginator as Paginator;
 
-class BetsHistory extends Menu
+class SelectCountry extends Menu
 {
     use Paginator;
 
-    /**
-     * Number of items to display per page
-     */
-    protected $maxItemsPerPage = 4;
+    protected $perPage = 4;
 
+    /**
+     * Menu message.
+     *
+     * @return string|array
+     */
     public function message()
     {
-        if (!$this->paginationTotal()) {
-            return "You don't have any bet.";
-        } else {
-            return $this->isPaginationFirstPage() ? 'Your betting history' : '';
+        if (!$this->itemsExist()) {
+            return 'No item found';
         }
+
+        return 'Select an option';
     }
 
-  /**
-   * Defines how the items will be displayed to the user.
-   * 
-   * This method will automatically be called for each rows of the array 
-   * returned by `paginationFetch`. And its return value will be added to the 
-   * actions 
-   * 
-   * The option is what will be displayed to the user as option to select.
-   * It's automatically handled by the Paginator
-   * 
-   * @param array $row 
-   * @param string $option
-   * @return array
-   */
-    public function itemAction($row, $option)
+    /**
+     * Items to paginate.
+     *
+     * Do not use '->get()' or '->first()' on the query.
+     * Rejoice will perform it at the appropriate time.
+     *
+     * @return Rejoice\Database\QueryBuilder
+     */
+    public function paginate()
+    {
+        // return Model::where([]);
+    }
+
+    /**
+     * Will be called for each item.
+     *
+     * @param array|Rejoice\Support\Collection $row
+     * @param string $trigger
+     * @return array
+     */
+    public function itemAction($row, $trigger)
     {
         return [
-            $option => [
-                'message' => 'Bet ' . $row['id'],
-                'next_menu' => 'bet::bet_details',
-                'save_as' => $row['id'],
+            $trigger => [
+                'display'   => $row['name'],
+                'next_menu' => 'menu_name',
+                'save_as'   => $row['id'],
             ],
         ];
     }
+}
+```
 
-    /**
-     * Fetches the items from the database
-     * 
-     * @return array
-     */
-    public function paginationFetch()
+The `paginate` method will be called to retrieve the items from the database. It must return the query to select the items from the database or a logic returning the an array of the current items.
+
+The `itemAction` defines the action to perform for each item.
+
+We just now need to modify the paginate method and the `itemAction`.
+
+Assuming we have a `Country` model, let's modify our `paginate` method:
+
+```php
+public function paginate()
+{
+    $continent = $this->previousResponses('SelectContinent');
+
+    return Country::where('continent_id', '=', $continent);
+}
+```
+
+Assuming a country has a name and a code and we rather want to save the country's code instead of the ID and the next menu is `InputName`, let's modify the `itemAction` function like this:
+
+```php
+public function itemAction($country, $trigger)
+{
+    return [
+        $trigger => [
+            'display'   => $country['name'],
+            'next_menu' => 'InputName',
+            'save_as'   => $country['code'],
+        ],
+    ];
+}
+```
+
+That's all! We have our paginable menu:
+
+```php
+
+namespace App\Menus;
+
+use App\Menus\Menu;
+use App\Models\Country;
+use Rejoice\Menu\EloquentPaginator as Paginator;
+
+class SelectCountry extends Menu
+{
+    use Paginator;
+
+    protected $perPage = 4;
+
+    public function message()
     {
-        if (isset($this->bets)) {
-            return $this->bets;
+        if (!$this->itemsExist()) {
+            return 'No item found';
         }
 
-        $req = $this->db()->prepare("SELECT * FROM bets
-        WHERE id > :offset
-        AND initiator_id = :initiator_id
-        ORDER BY id
-        LIMIT :limit");
-
-        $offset = $this->lastRetrievedId();
-        $userId = $this->user('id');
-        $limit = $this->maxItemsPerPage();
-
-        $req->bindParam('offset', $offset, \PDO::PARAM_INT);
-        $req->bindParam('initiator_id', $userId);
-        $req->bindParam('limit', $limit, \PDO::PARAM_INT);
-        $req->execute();
-
-        $this->bets = $req->fetchAll(\PDO::FETCH_ASSOC);
-
-        $req->closeCursor();
-
-        return $this->bets;
+        return 'Select an option';
     }
 
-    /**
-     * Returns the total number of the data to be displayed
-     * 
-     * @return  int
-     */
-    public function paginationCountAll()
+    public function paginate()
     {
-        if ($total = $this->paginationGet('total')) {
-            return $total;
-        }
+        $continent = $this->previousResponses('SelectContinent');
 
-        $req = $this->db()->prepare("SELECT COUNT(*) FROM bets WHERE  initiator_id = ?");
-        $req->execute([
-            $this->user('id')
-        ]);
+        return Country::where('continent_id', '=', $continent);
+    }
 
-        $paginationTotal = intval($req->fetchColumn());
-        $req->closeCursor();
-
-        $this->paginationSave('total', $paginationTotal);
-
-        return $paginationTotal;
+    public function itemAction($country, $trigger)
+    {
+        return [
+            $trigger => [
+                'display'   => $country['name'],
+                'next_menu' => 'InputName',
+                'save_as'   => $country['code'],
+            ],
+        ];
     }
 }
 ```
-The paginator makes available some methods for our use:
-- `maxItemsPerPage` The maximum number of items that can be showed on the pagination screen; It's configured as protected property of the menu entity;
-- `currentItemsCount` The actual number of items showed on the current screen;
+
+We can also customize the `message` method to display different message based on the page on which we are by using one or both of the methods `isPaginationFirstPage` or `isPaginationLastPage`:
+
+```php
+public function message()
+{
+    if (!$this->itemsExist()) {
+        return 'No item found';
+    } elseif ($this->isPaginationFirstPage()) {
+        return 'Select an option';
+    } elseif ($this->isPaginationFirstPage()) {
+        return 'Last page';
+    }
+
+    return '';
+}
+```
+
+The paginator trait makes available some methods for our use:
+
+- `perPage` The maximum number of items that can be showed on the pagination screen; this method will return the `perPage` property of the menu if it's configured, else it will return a default value. The default value is `4`.
+- `currentItemsCount` The actual number of items showed on the current screen (the number of items can be less the `perPage`, on the last page.);
 - `isPaginationFirstPage` Check if the current screen is the first screen of the pagination;
 - `isPaginationLastPage` Check if the current screen is the last screen of the pagination;
 - `lastRetrievedId` Get the id of the last fetched row - the next query to the database to fetch, will begin at that index;
@@ -148,16 +195,18 @@ The paginator makes available some methods for our use:
 - `paginationGet` Get a pagination data;
 - `paginationHas` Check if a pagination data exists;
 
-<div class="note note-warning">When using the pagination, always prefer 
+<div class="note note-warning">When using the pagination, always prefer:
 
 ```php
-$this->userPreviousResponses('the_name_of_the_previous_menu');
+$this->previousResponses('the_name_of_the_previous_menu');
 ```
+
 to retrieve the response of the previous menu, over
 
 ```php
-$this->userResponse(); 
+$this->userResponse();
 //or
 $this->userSavedResponse();
 ```
+
 </div>

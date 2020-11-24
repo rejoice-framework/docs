@@ -59,20 +59,20 @@ It is important to always see a menu class in two parts: the part that runs **be
 
 ### Retrieve a user's response from any menu
 
-You can easily have access to the response response of the user on any menu by using the `userPreviousResponses` helper method.
+You can easily have access to the response response of the user on any menu by using the `previousResponses` helper method.
 
 You will pass the menu name to the method.
 
 ```php
 public function before()
 {
-    $name = $this->userPreviousResponses('enter_username');
+    $name = $this->previousResponses('enter_username');
 
     $this->respond("Thank you {$name}. You have successfully registered.");
 }
 ```
 
-Without argument, `userPreviousResponses` returns an object that allows us to retrieve the user response.
+Without argument, `previousResponses` returns an object that allows us to retrieve the user response.
 
 The object has two useful methods: `get` and `has`.
 `get` allows to retrieve a response.
@@ -81,7 +81,7 @@ The object has two useful methods: `get` and `has`.
 ```php
 public function before()
 {
-    $responses = $this->userPreviousResponses();
+    $responses = $this->previousResponses();
     $name = $responses->has('enter_username') ? $responses->get('enter_username') : 'dear user';
 
     $this->respond("Thank you {$name}. You have successfully registered.");
@@ -95,36 +95,40 @@ You can pass a second parameter as default value that will be returned if the re
 ```php
 public function before()
 {
-    $name = $this->userPreviousResponses('enter_username', 'dear user');
+    $name = $this->previousResponses('enter_username', 'dear user');
 
     $this->respond("Thank you {$name}. You have successfully registered.");
 }
 ```
+
 Or Using the `get` method:
+
 ```php
 public function before()
 {
-    $name = $this->userPreviousResponses()->get('enter_username', 'dear user');
+    $name = $this->previousResponses()->get('enter_username', 'dear user');
 
     $this->respond("Thank you {$name}. You have successfully registered.");
 }
 ```
 
 ### Multiple responses
+
 Sometimes it is useful to have multiple answers for the same menu. Let's take the example of a simple e-commerce application where the user can choose multiple products. To have access to all the chosen products.
 
-Having access to all the responses on a menu is as simple as calling the `getAll` method on the object returned by `userPreviousResponses`.
+Having access to all the responses on a menu is as simple as calling the `getAll` method on the object returned by `previousResponses`.
 
 ```php
 public function before()
 {
-    $products = $this->userPreviousResponses()->getAll('choose_product');
+    $products = $this->previousResponses()->getAll('choose_product');
 
     // Process the chosen products here
 
     $this->respond("Your order is being processed.");
 }
 ```
+
 The `getAll` method returns an array containing the responses of the user on the `choose_product` menu. The first response is at the first index, the second at the second index, etc.
 
 See it in activity in this [sample application](samples/e-commerce).

@@ -18,11 +18,15 @@ nav_order: 90
 
 
 ## Retrieving the request parameters
+
 ### Any request POST parameter
+
 ```php
 $this->request()->input('name_of_the_input');
 ```
+
 For POST parameters, the request method can be used directly:
+
 ```php
 $this->request('name_of_the_input');
 // Equivalent to
@@ -30,6 +34,7 @@ $this->request()->input('name_of_the_input');
 ```
 
 ### Any request GET parameter
+
 ```php
 $this->request()->query('name_of_the_input');
 ```
@@ -37,6 +42,7 @@ $this->request()->query('name_of_the_input');
 While this two methods are useful, Rejoice has helper methods for some of the parameters:
 
 ### The phone number of the user
+
 ```php
 $this->tel();
 // or
@@ -44,6 +50,7 @@ $this->msisdn();
 ```
 
 ### The network
+
 ```php
 $this->network();
 ```
@@ -51,6 +58,7 @@ $this->network();
 This returns the [MNC](glossary#mnc) of the user, not the network name.
 
 ### The session ID
+
 ```php
 $this->sessionId();
 ```
@@ -58,16 +66,19 @@ $this->sessionId();
 The session ID is retrieved from the mobile operator.
 
 ### The request type (a.k.a service operator code)
+
 ```php
 $this->ussdRequestType();
 ```
 
 ### The user's response (a.k.a USSD string)
+
 ```php
 $this->userResponse();
 ```
 
 ### The channel
+
 Useful when building an application not only for USSD. You can do extra stuff, customize the response, etc., based on the channel.
 
 ```php
