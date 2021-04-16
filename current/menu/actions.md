@@ -548,7 +548,7 @@ class ProcessBalanceRequest extends Menu
 
 ## Later menu
 
-Later menu is a powerful concept that helps you to modify the normal flow of the menu. Actually, every menu defined is attached to another menu through the `next_menu` parameter. It restrict you to use a menu for a specific purpose out of it flow. The later menu bypass that limitation and allows you to call a menu outside of its flow. View from other side, it allows us to create a menu that is not dependent on a particular flow but is rather *alone* and used by multiple flows. This is a scenario to help understand the concept and a use case of a later menu.
+Later menu is a powerful concept that helps you to modify the normal flow of the menu. When designing a flow, each menu must be attached to another menu through the `next_menu` parameter. The later menu bypasses that limitation and allows you to create and call a menu that is not bound to any flow but is rather *standalone* and can be used by multiple flows. This is a scenario to help understand the concept and a use case of a later menu.
 
 ```php
 // resources/menus/menus.php
